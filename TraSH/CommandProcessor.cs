@@ -8,6 +8,7 @@ namespace TraSH
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Threading;
     using TraSH.Builtins;
@@ -43,6 +44,18 @@ namespace TraSH
         {
             if (this.shellCommand.CommandList.Count == 0)
             {
+                return;
+            }
+
+            if (this.shellCommand.CommandList.Any(c => this.builtInsMap.ContainsKey(c.Command)) && this.shellCommand.CommandList.Count > 1)
+            {
+                this.errWriter.WriteLine($"Cannot run commands together: {string.Join(',', this.shellCommand.CommandList.Select(c => c.Command))}");
+                return;
+            }
+
+            if (this.builtInsMap.ContainsKey(this.shellCommand.CommandList[0].Command))
+            {
+                this.ExecuteBuiltinCommand(this.shellCommand.CommandList[0]);
                 return;
             }
 
