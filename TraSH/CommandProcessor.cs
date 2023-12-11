@@ -56,6 +56,12 @@ namespace TraSH
             Process prevProc = null;
             foreach (SimpleCommand command in this.shellCommand.CommandList)
             {
+                if (!CommandValidator.Validate(command.Command))
+                {
+                    this.errWriter.WriteLine($"Command not found: {command.Command}");
+                    return;
+                }
+
                 Process proc = command.AsProcess();
 
                 if (prevProc == null)
@@ -86,7 +92,6 @@ namespace TraSH
             }
             catch (System.ComponentModel.Win32Exception)
             {
-                this.errWriter.WriteLine($": Command not found");
                 procList.ForEach(p => p.Kill());
             }
         }
