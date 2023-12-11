@@ -9,21 +9,12 @@ namespace TraSH
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading;
     using TraSH.Builtins;
     using TraSH.Model;
 
     public class CommandProcessor
     {
-        private readonly Dictionary<string, BuiltInCommand> builtInsMap = new Dictionary<string, BuiltInCommand>()
-        {
-            { "cls", new Clear() },
-            { "clear", new Clear() },
-            { "cd", new ChangeDirectory() },
-            { "exit", new Exit() }
-        };
-
         private readonly ShellCommand shellCommand;
         private readonly TextWriter outWriter;
         private readonly TextWriter errWriter;
@@ -47,13 +38,13 @@ namespace TraSH
                 return;
             }
 
-            if (this.shellCommand.CommandList.Any(c => this.builtInsMap.ContainsKey(c.Command)) && this.shellCommand.CommandList.Count > 1)
+            if (this.shellCommand.CommandList.Any(c => BuiltInCommands.Map.ContainsKey(c.Command)) && this.shellCommand.CommandList.Count > 1)
             {
                 this.errWriter.WriteLine($"Cannot run commands together: {string.Join(',', this.shellCommand.CommandList.Select(c => c.Command))}");
                 return;
             }
 
-            if (this.builtInsMap.ContainsKey(this.shellCommand.CommandList[0].Command))
+            if (BuiltInCommands.Map.ContainsKey(this.shellCommand.CommandList[0].Command))
             {
                 this.ExecuteBuiltinCommand(this.shellCommand.CommandList[0]);
                 return;
@@ -115,7 +106,7 @@ namespace TraSH
 
         private void ExecuteBuiltinCommand(SimpleCommand command)
         {
-            BuiltInCommand builtInCommand = this.builtInsMap[command.Command];
+            var builtInCommand = BuiltInCommands.Map[command.Command];
 
             string output = builtInCommand.Execute(command.Arguments);
 
